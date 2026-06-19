@@ -1,12 +1,15 @@
 // ==========================================
-// ১. সুপাবেস কানেকশন ইনিশিয়ালিজেশন (১০০% সঠিক কী সহ)
+// ১. সুপাবেস কানেকশন ইনিশিয়ালিজেশন
 // ==========================================
-const SUPABASE_URL = "https://izkkonqhrfujfdxslbbn.supabase.co"; 
+const PROJ_URL = "https://izkkonqhrfujfdxslbbn.supabase.co"; 
+const PROJ_KEY = "eyJhY2NvdW50X2lkIjoiZzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6a2tvbnFocmZ1amZkeHNsYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzYxOTgsImV4cCI6MjA5NzQ1MjE5OH0.dZSFbK7BOk7PoUZCe9E4xmT94B_jjG-oS1Bw_mcMiNk";   
 
-// তোমার ড্যাশবোর্ডের আসল ফুল কোডটি এখানে বসিয়ে দেওয়া হলো
-const SUPABASE_KEY = "eyJhY2NvdW50X2lkIjoiZzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6a2tvbnFocmZ1amZkeHNsYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzYxOTgsImV4cCI6MjA5NzQ1MjE5OH0.dZSFbK7BOk7PoUZCe9E4xmT94B_jjG-oS1Bw_mcMiNk";   
+// ভেরিয়েবলের নাম সম্পূর্ণ আলাদা রাখা হলো যেন ব্রাউজারে কোনো সংঘর্ষ না হয়
+const mySupabaseInstance = window.supabase.createClient(PROJ_URL, PROJ_KEY);
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Study Mate App Loaded successfully!");
+});
 
 // ==========================================
 // ২. লগইন ফাংশন
@@ -24,35 +27,32 @@ async function login() {
     }
 
     try {
-        // ডাটাবেজ থেকে ডেটা নিয়ে আসা
-        const { data, error } = await supabase
+        // সুপাবেস থেকে ডাটা চেক করা
+        const { data, error } = await mySupabaseInstance
             .from('users')
-            .select('*');
+            .select('*')
+            .eq('username', usernameInput)
+            .eq('password', passwordInput);
 
-        if (error) {
-            console.error("Supabase Database Error:", error);
-            if (errorMsg) errorMsg.innerText = "ডাটাবেজ কানেকশনে সমস্যা হচ্ছে!";
-            return;
-        }
+        if (error) throw error;
 
-        // টেবিলে থাকা ডেটার সাথে মিলানো
-        const matchedUser = data.find(u => u.username === usernameInput && u.password === passwordInput);
-
-        if (matchedUser) {
-            // লগইন সফল হলে ড্যাশবোর্ড দেখাবে
+        if (data && data.length > 0) {
+            const user = data[0];
+            
+            // লগইন সফল হলে ড্যাশবোর্ড দেখানো
             document.getElementById('login-section').classList.remove('active-section');
             const appSection = document.getElementById('app-section');
             if (appSection) {
                 appSection.classList.add('active-section');
             }
-            alert(`স্বাগতম, ${matchedUser.username}!`);
+            alert(`স্বাগতম, ${user.username}!`);
         } else {
             if (errorMsg) errorMsg.innerText = "ভুল ইউজারনেম বা পাসওয়ার্ড!";
         }
 
     } catch (err) {
-        console.error("JavaScript Catch Error:", err);
-        if (errorMsg) errorMsg.innerText = "কোড রান করতে সমস্যা হচ্ছে!";
+        console.error("Connection error details:", err);
+        if (errorMsg) errorMsg.innerText = "ডাটাবেজ কানেকশনে সমস্যা হচ্ছে!";
     }
 }
 

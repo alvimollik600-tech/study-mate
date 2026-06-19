@@ -2,7 +2,7 @@
 // ১. সুপাবেস কানেকশন ইনিশিয়ালিজেশন
 // ==========================================
 const PROJ_URL = "https://izkkonqhrfujfdxslbbn.supabase.co"; 
-const PROJ_KEY = "eyJhY2NvdW50X2lkIjoiZzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6a2tvbnFocmZ1amZkeHNsYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzYxOTgsImV4cCI6MjA5NzQ1MjE5OH0.dZSFbK7BOk7PoUZCe9E4xmT94B_jjG-oS1Bw_mcMiNk";   
+const PROJ_KEY = "sb_publishable_NiOqm647_5GRg8cNDEewPA_NAst1vNS";   
 
 // ভেরিয়েবলের নাম সম্পূর্ণ আলাদা রাখা হলো যেন ব্রাউজারে কোনো সংঘর্ষ না হয়
 const mySupabaseInstance = window.supabase.createClient(PROJ_URL, PROJ_KEY);

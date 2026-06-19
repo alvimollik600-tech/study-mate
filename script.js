@@ -1,16 +1,11 @@
 // ==========================================
-// ১. সুপাবেস কানেকশন ইনিশিয়ালিজেশন (ভেরিয়েবল নাম ফিক্সড)
+// ১. সুপাবেস ক্লায়েন্ট তৈরি (Direct Window Object)
 // ==========================================
 const SUPABASE_URL = "https://izkkonqhrfujfdxslbbn.supabase.co"; 
 const SUPABASE_KEY = "eyJhY2NvdW50X2lkIjoiZzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6a2tvbnFocmZ1amZkeHNsYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NzYxOTgsImV4cCI6MjA5NzQ1MjE5OH0.dZSFbK7BOk7PoUZCe9E4xmT94B_jjG-oS1Bw_mcMiNk";   
 
-// ভেরিয়েবলের নাম পরিবর্তন করা হয়েছে যেন ক্র্যাশ না করে
-const supabaseClient = window.supabasejs || window.supabase;
-const mySupabase = supabaseClient.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Study Mate App Loaded successfully!");
-});
+// কোনো ভেরিয়েবল ক্ল্যাশ এড়াতে সরাসরি উইন্ডো অবজেক্ট ব্যবহার
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ==========================================
 // ২. লগইন ফাংশন
@@ -28,32 +23,35 @@ async function login() {
     }
 
     try {
-        // নতুন ভেরিয়েবল mySupabase ব্যবহার করে ডাটা চেক
-        const { data, error } = await mySupabase
+        // একদম ডিরেক্ট কুয়েরি
+        const { data, error } = await supabase
             .from('users')
-            .select('*')
-            .eq('username', usernameInput)
-            .eq('password', passwordInput);
+            .select('*');
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase Error Details:", error);
+            if (errorMsg) errorMsg.innerText = "ডাটাবেজ থেকে রেসপন্স আসছে না!";
+            return;
+        }
 
-        if (data && data.length > 0) {
-            const user = data[0];
-            
-            // লগইন সফল হলে স্ক্রিন পরিবর্তন
+        // ম্যানুয়াল ম্যাচিং (যেন কোনো কুয়েরি মিস না হয়)
+        const matchedUser = data.find(u => u.username === usernameInput && u.password === passwordInput);
+
+        if (matchedUser) {
+            // লগইন সফল হলে ড্যাশবোর্ড দেখানো
             document.getElementById('login-section').classList.remove('active-section');
             const appSection = document.getElementById('app-section');
             if (appSection) {
                 appSection.classList.add('active-section');
             }
-            alert(`স্বাগতম, ${user.username}!`);
+            alert(`স্বাগতম, ${matchedUser.username}!`);
         } else {
             if (errorMsg) errorMsg.innerText = "ভুল ইউজারনেম বা পাসওয়ার্ড!";
         }
 
     } catch (err) {
-        console.error("Supabase Connection Error:", err);
-        if (errorMsg) errorMsg.innerText = "ডাটাবেজ কানেকশনে সমস্যা হচ্ছে!";
+        console.error("JavaScript Catch Error:", err);
+        if (errorMsg) errorMsg.innerText = "কোডে বা লাইব্রেরিতে সমস্যা হচ্ছে!";
     }
 }
 
@@ -64,11 +62,8 @@ function switchSection(sectionId) {
     document.querySelectorAll('.view-section').forEach(section => {
         section.classList.remove('active-section');
     });
-    
     const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.classList.add('active-section');
-    }
+    if (targetSection) targetSection.classList.add('active-section');
 }
 
 function logout() {
@@ -76,7 +71,6 @@ function logout() {
         section.classList.remove('active-section');
     });
     document.getElementById('login-section').classList.add('active-section');
-    
     document.getElementById('login-username').value = "";
     document.getElementById('login-password').value = "";
 }

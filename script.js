@@ -1,6 +1,6 @@
 // --- ১. সুপাবেস কানেকশন ইনিশিয়ালিজেশন ---
 const SUPABASE_URL = "https://izkkonqhrfujfdxslbbn.supabase.co"; 
-const SUPABASE_KEY = "sb_publishable_NiOqm647_5GRg8cNDEewPA_NAst1vNS";  
+const SUPABASE_KEY = "sb_publishable_NiOqm647_5GRg8";  
 const supabase = supabasejs.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function login() {
     const usernameInput = document.getElementById('login-username').value.trim();
